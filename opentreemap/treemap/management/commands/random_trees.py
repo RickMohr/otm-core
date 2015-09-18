@@ -10,6 +10,7 @@ import math
 from django.contrib.gis.geos import Point
 
 from treemap.models import Plot, Tree, Species
+from treemap.ecocache import clear_benefit_cache
 
 from treemap.management.util import InstanceDataCommand
 
@@ -106,4 +107,5 @@ class Command(InstanceDataCommand):
                 ct += 1
 
         instance.update_geo_rev()
+        clear_benefit_cache(instance)
         self.stdout.write("Created %s trees and %s plots" % (ct, cp))

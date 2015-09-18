@@ -186,20 +186,12 @@ class Instance(models.Model):
     basemap_data = models.CharField(max_length=255, null=True, blank=True)
 
     """
-    The current database revision for the instance
-
-    This revision is used to determine if tiles should be cached.
-    In particular, the revision has *no* effect on the actual
-    data.
-
-    Generally we make tile requests like:
-    http://tileserver/tile/{layer}/{rev}/{Z}/{Y}/{X}
-
-    There is a database trigger that updates the
-    revision whenever an edit to a geometry field is made
-    so you don't have to worry about it.
-
-    You should *not* edit this field.
+    The "geometric revision" is a monotonically increasing counter,
+    incremented whenever a map feature is modified in a way that would
+    affect rendered tiles. Its (hashed) value is part of all tile URLs, so
+    that repeated requests for the same tile may benefit from caching.
+    When e.g. a tree is added/moved/deleted the geo_rev is incremented,
+    and previously-cached tiles are no longer requested.
     """
     geo_rev = models.IntegerField(default=1)
 

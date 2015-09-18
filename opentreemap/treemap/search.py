@@ -55,8 +55,19 @@ MAP_FEATURE_RELATED_NAMES = {'mapFeature', 'mapFeaturePhoto'}
 class Filter(object):
     def __init__(self, filterstr, displaystr, instance):
         self.filterstr = filterstr
+        self.displaystr = displaystr
         self.display_filter = loads(displaystr) if displaystr else None
         self.instance = instance
+
+    @property
+    def is_empty(self):
+        # TODO: Update this when the "empty" filter changes to ignore
+        # hidden map feature types
+        return not self.filterstr and not self.displaystr
+
+    @property
+    def cache_key(self):
+        return "%s/%s" % (self.filterstr, self.displaystr)
 
     def get_objects(self, ModelClass):
         # Filter out invalid models

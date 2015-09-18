@@ -36,6 +36,8 @@ from importer.models.trees import TreeImportEvent, TreeImportRow
 from importer.models.species import SpeciesImportEvent, SpeciesImportRow
 from importer.views import (process_csv, process_status,
                             commit, merge_species, start_import)
+from treemap.search import Filter
+from treemap.ecocache import cache_benefits, get_cached_benefits
 
 
 class MergeTest(TestCase):
@@ -1014,14 +1016,28 @@ class TreeIntegrationTests(IntegrationTests):
         | 19.2    | 27.2    | 14       |
         | 13.2    | 77.2    | 16       |
         """
-        rev1 = self.instance.geo_rev
+        geo_rev = self.instance.geo_rev
 
         self.run_through_commit_views(csv)
 
         self.instance = Instance.objects.get(pk=self.instance.pk)
-        rev2 = self.instance.geo_rev
 
-        self.assertEqual(rev1 + 1, rev2)
+        self.assertEqual(geo_rev + 1, self.instance.geo_rev)
+
+    def test_eco_cache_cleared(self):
+        csv = """
+        | point x | point y | diameter |
+        | 34.2    | 29.2    | 12       |
+        | 19.2    | 27.2    | 14       |
+        | 13.2    | 77.2    | 16       |
+        """
+        filter = Filter('', '', self.instance)
+        cache_benefits(self.instance, filter, 'benefits')
+
+        self.run_through_commit_views(csv)
+
+        benefits = get_cached_benefits(self.instance, filter)
+        self.assertEqual(benefits, None)
 
     def test_bad_structure(self):
         # Point Y -> PointY, expecting two errors

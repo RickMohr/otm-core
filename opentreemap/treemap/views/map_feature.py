@@ -15,6 +15,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import transaction
 from django.contrib.gis.geos import Point, MultiPolygon, Polygon
+from django.contrib.gis.db.models import GeometryField
 
 from opentreemap.util import dotted_split
 
@@ -32,6 +33,7 @@ from treemap.lib.map_feature import (get_map_feature_or_404,
                                      context_dict_for_map_feature)
 from treemap.lib.perms import map_feature_is_deletable
 from treemap.views.misc import add_map_info_to_context
+from treemap.ecocache import clear_benefit_cache
 
 
 def _request_to_update_map_feature(request, feature):
@@ -176,7 +178,6 @@ def update_map_feature(request_dict, user, feature):
         feature.convert_to_display_units()
 
     def set_attr_on_model(model, attr, val):
-        rev_update = False
         field_classname = \
             model._meta.get_field_by_name(attr)[0].__class__.__name__
 
@@ -188,7 +189,6 @@ def update_map_feature(request_dict, user, feature):
             srid = val.get('srid', 4326)
             val = MultiPolygon(Polygon(val['polygon'], srid=srid), srid=srid)
             val.transform(3857)
-            rev_update = True
 
         if attr == 'mapfeature_ptr':
             if model.mapfeature_ptr_id != value:
@@ -210,7 +210,6 @@ def update_map_feature(request_dict, user, feature):
             model.apply_change(attr, val)
         else:
             raise Exception('Malformed request - invalid field %s' % attr)
-        return rev_update
 
     def save_and_return_errors(thing, user):
         try:
@@ -222,11 +221,10 @@ def update_map_feature(request_dict, user, feature):
         except ValidationError as e:
             return package_field_errors(thing._model_name, e)
 
-    old_location = feature.geom
-
     tree = None
 
-    should_update_rev = False
+    should_update_geo_rev = False
+    should_clear_benefit_cache = False
     for (identifier, value) in request_dict.iteritems():
         split_template = 'Malformed request - invalid field %s'
         object_name, field = dotted_split(identifier, 2,
@@ -263,8 +261,14 @@ def update_map_feature(request_dict, user, feature):
             raise Exception(
                 'Malformed request - invalid model %s' % object_name)
 
-        has_rev_update = set_attr_on_model(model, field, value)
-        should_update_rev = should_update_rev or has_rev_update
+        set_attr_on_model(model, field, value)
+
+        field_class = model._meta.get_field_by_name(field)[0]
+        if isinstance(field_class, GeometryField):
+            should_update_geo_rev = True
+            should_clear_benefit_cache = True
+        elif identifier in ['tree.species', 'tree.diameter']:
+            should_clear_benefit_cache = True
 
     errors = {}
 
@@ -281,10 +285,10 @@ def update_map_feature(request_dict, user, feature):
             errors['mapFeature.geom'] = errors[feature.geom_field_name]
         raise ValidationError(errors)
 
-    if ((old_location is None or
-         not feature.geom.equals_exact(old_location) or
-         should_update_rev)):
+    if should_update_geo_rev:
         feature.instance.update_geo_rev()
+    if should_clear_benefit_cache:
+        clear_benefit_cache(feature.instance)
 
     return feature, tree
 

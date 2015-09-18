@@ -33,6 +33,7 @@ from treemap.units import Convertible
 from treemap.udf import UDFModel, GeoHStoreUDFManager
 from treemap.instance import Instance
 from treemap.lib.object_caches import invalidate_adjuncts
+from treemap.ecocache import clear_benefit_cache
 
 
 def _action_format_string_for_location(action):
@@ -612,6 +613,7 @@ class MapFeature(Convertible, UDFModel, PendingAuditable):
 
     def delete_with_user(self, user, *args, **kwargs):
         self.instance.update_geo_rev()
+        clear_benefit_cache(self.instance)
         super(MapFeature, self).delete_with_user(user, *args, **kwargs)
 
     def photos(self):

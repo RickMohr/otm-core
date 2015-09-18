@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 
 from treemap.models import Species
+from treemap.ecocache import clear_benefit_cache
 
 from importer.models.base import GenericImportEvent, GenericImportRow
 from importer.models.species import SpeciesImportEvent, SpeciesImportRow
@@ -165,6 +166,9 @@ def _finalize_commit(import_type, import_event_id):
 
     if import_type == TreeImportEvent.import_type:
         ie.instance.update_geo_rev()
+
+    # A species import could change a species' i-Tree region, affecting eco
+    clear_benefit_cache(ie.instance)
 
 
 def _get_import_event(import_type, import_event_id):

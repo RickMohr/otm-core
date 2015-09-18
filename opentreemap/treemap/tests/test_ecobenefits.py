@@ -13,10 +13,11 @@ from treemap import ecobackend
 from treemap.ecobenefits import (TreeBenefitsCalculator,
                                  _combine_benefit_basis,
                                  _annotate_basis_with_extra_stats,
-                                 _combine_grouped_benefits)
-
-from treemap.ecobenefits import BenefitCategory
+                                 _combine_grouped_benefits, BenefitCategory)
 from treemap.views.tree import search_tree_benefits
+from treemap.search import Filter
+from treemap.ecocache import (cache_benefits, get_cached_benefits,
+                              clear_benefit_cache)
 
 
 class EcoTest(UrlTestCase):
@@ -326,3 +327,22 @@ class EcoTest(UrlTestCase):
         _annotate_basis_with_extra_stats(basis)
 
         self.assertEqual(basis, target)
+
+
+class EcoCacheTest(UrlTestCase):
+    def setUp(self):
+        self.instance = make_instance()
+        self.benefits = 'some benefits'
+        self.filter = Filter('', '', self.instance)
+        clear_benefit_cache(self.instance)
+        cache_benefits(self.instance, self.filter, self.benefits)
+
+    def test_benefits_are_cached(self):
+        benefits = get_cached_benefits(self.instance, self.filter)
+        self.assertEqual(benefits, self.benefits)
+
+    def test_clear_cache(self):
+        clear_benefit_cache(self.instance)
+        benefits = get_cached_benefits(self.instance, self.filter)
+        self.assertEqual(benefits, None)
+
