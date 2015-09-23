@@ -33,25 +33,36 @@ class Command(BaseCommand):
             except ValueError:
                 raise CommandError('Second argument must be a number')
 
-        self.stdout.write('Clearing hide_at_zoom for all map features')
-        MapFeature.objects.all().update(instance=instance, hide_at_zoom=None)
+        self.stdout.write(
+            'Clearing hide_at_zoom for all map features in this instance')
+        MapFeature.objects.all() \
+            .filter(instance=instance) \
+            .update(hide_at_zoom=None)
 
-        for zoom in range(14, 10, -1):
-            self.stdout.write('Zoom %s' % zoom)
+        # for zoom in range(6, 5, -1):
+        for zoom in range(14, 5, -1):
             sql = make_sql(instance, zoom, grid_pixels)
             with connection.cursor() as cursor:
                 cursor.execute(sql)
+            print_summary(instance, grid_pixels, zoom)
 
-        n = MapFeature.objects.filter(instance=instance).count()
-        nvis = MapFeature.objects.filter(instance=instance, hide_at_zoom=None).count()
-        self.stdout.write('%s features (%s%%) visible at zoom 11' % nvis, nvis/n)
+
+def print_summary(instance, grid_pixels, zoom):
+    #n = MapFeature.objects.filter(instance=instance).count()
+    grid_size_wm = get_grid_size_wm(grid_pixels, zoom)
+    features = MapFeature.objects.filter(instance=instance, hide_at_zoom=None)
+    snapped = features.geom.snap_to_grid(grid_size_wm)
+    nvis = features.count()
+    print('%s  %s' % (zoom, nvis))
+    if nvis < 3:
+        for feature in features:
+            print("    %s: (%s, %s) (%s, %s)" % (
+                feature.id, feature.geom.x, feature.geom.y, snapped.x, snapped.y))
 
 
 def make_sql(instance, zoom, grid_pixels):
-    wm_world_width = 40075016.6856
-    tile_size = 256
-    wm_units_per_pixel = wm_world_width / (tile_size * pow(2, zoom))
-    grid_size_wm = grid_pixels * wm_units_per_pixel
+    grid_size_wm = get_grid_size_wm(grid_pixels, zoom)
+    #print(grid_size_wm)
 
     sql = """
         WITH featuresToHide AS (
@@ -76,3 +87,13 @@ def make_sql(instance, zoom, grid_pixels):
         """ % (instance.id, grid_size_wm, zoom)
 
     return sql
+
+
+def get_grid_size_wm(grid_pixels, zoom):
+    wm_world_width = 40075016.6856
+    tile_size = 256
+    wm_units_per_pixel = wm_world_width / (tile_size * pow(2, zoom))
+    grid_size_wm = grid_pixels * wm_units_per_pixel
+    return grid_size_wm
+
+
