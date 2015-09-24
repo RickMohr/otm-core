@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('treemap', '0008_instance_eco_rev'),
+        ('treemap', '0009_restructure_replaceable_terms'),
     ]
 
     operations = [
