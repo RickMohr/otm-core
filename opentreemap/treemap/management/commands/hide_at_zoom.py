@@ -51,13 +51,16 @@ def print_summary(instance, grid_pixels, zoom):
     #n = MapFeature.objects.filter(instance=instance).count()
     grid_size_wm = get_grid_size_wm(grid_pixels, zoom)
     features = MapFeature.objects.filter(instance=instance, hide_at_zoom=None)
-    snapped = features.geom.snap_to_grid(grid_size_wm)
+    snapped_features = features.snap_to_grid(grid_size_wm)
     nvis = features.count()
     print('%s  %s' % (zoom, nvis))
     if nvis < 3:
-        for feature in features:
+        print("    grid_size_wm = %s" % grid_size_wm)
+        for i in range(0, nvis):
+            feature = features[i]
+            snapped = snapped_features[i]
             print("    %s: (%s, %s) (%s, %s)" % (
-                feature.id, feature.geom.x, feature.geom.y, snapped.x, snapped.y))
+                feature.id, feature.geom.x, feature.geom.y, snapped.snap_to_grid.x, snapped.snap_to_grid.y))
 
 
 def make_sql(instance, zoom, grid_pixels):
