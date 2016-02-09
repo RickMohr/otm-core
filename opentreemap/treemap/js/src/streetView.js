@@ -9,6 +9,7 @@ var google = require('googlemaps'),
 exports.create = function(options) {
     var panorama = null,
         curLocation = null,
+        marker = null,
         showAddress = !options.hideAddress;
 
     var div = options.streetViewElem;
@@ -47,6 +48,13 @@ exports.create = function(options) {
                     pov.heading = heading;
                     panorama.setPov(pov);
                 }
+                if (marker === null) {
+                    marker = new google.maps.Marker({
+                        map: panorama,
+                        title: 'Location'
+                    });
+                }
+                marker.setPosition(pos);
             } else {
                 panorama = null;
                 $(div).html(options.noStreetViewText || '');
