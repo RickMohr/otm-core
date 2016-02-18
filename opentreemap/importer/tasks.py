@@ -125,6 +125,8 @@ def _validate_rows(import_type, import_event_id, start_row_id):
     rows = ie.rows()[start_row_id:(start_row_id+settings.IMPORT_BATCH_SIZE)]
     for row in rows:
         row.validate_row()
+    ie.update_progress_timestamp_and_save()
+
 
 
 @task()
@@ -158,12 +160,12 @@ def commit_import_event(import_type, import_event_id):
 
 
 @task(rate_limit=settings.IMPORT_COMMIT_RATE_LIMIT)
-@transaction.atomic
 def _commit_rows(import_type, import_event_id, i):
     ie = _get_import_event(import_type, import_event_id)
 
     for row in ie.rows()[i:(i + settings.IMPORT_BATCH_SIZE)]:
         row.commit_row()
+    ie.update_progress_timestamp_and_save()
 
 
 @task()
