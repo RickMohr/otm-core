@@ -8,7 +8,6 @@ import json
 from celery import task, chord
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
-from django.db import transaction
 
 from importer.models.base import GenericImportEvent, GenericImportRow
 from importer.models.species import SpeciesImportEvent, SpeciesImportRow
@@ -126,7 +125,6 @@ def _validate_rows(import_type, import_event_id, start_row_id):
     for row in rows:
         row.validate_row()
     ie.update_progress_timestamp_and_save()
-
 
 
 @task()
