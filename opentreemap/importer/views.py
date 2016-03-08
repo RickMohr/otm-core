@@ -280,7 +280,8 @@ def show_import_status(request, instance, import_type, import_event_id):
 
     if ie.status == GenericImportEvent.FAILED_FILE_VERIFICATION:
         template = 'importer/partials/file_status.html'
-        legal_fields, required_fields = ie.legal_and_required_fields()
+        legal_fields, required_fields = \
+            ie.legal_and_required_fields_capitalized()
         ctx = {'ie': ie,
                'legal_fields': sorted(legal_fields),
                'required_fields': sorted(required_fields),
@@ -373,9 +374,10 @@ def _get_status_panel(instance, ie, panel_spec, page_number=1):
     if is_species and status == GenericImportRow.VERIFIED:
         query = query.filter(merged=True)
 
-    field_names = [f.lower() for f
-                   in json.loads(ie.field_order)
-                   if f != 'ignore']
+    field_names_original = [f for f
+                               in json.loads(ie.field_order)
+                               if f != 'ignore']
+    field_names = [f.lower() for f in field_names_original]
 
     class RowPage(Page):
         def __getitem__(self, *args, **kwargs):
@@ -399,7 +401,7 @@ def _get_status_panel(instance, ie, panel_spec, page_number=1):
     return {
         'name': panel_spec['name'],
         'title': panel_spec['title'],
-        'field_names': field_names,
+        'field_names': field_names_original,
         'row_count': row_pages.count,
         'rows': row_page,
         'paging_url': paging_url,
@@ -730,9 +732,9 @@ def cancel(request, instance, import_type, import_event_id):
 
 @queryset_as_exported_csv
 def export_all_species(request, instance):
-    fields = SpeciesImportRow.SPECIES_MAP.keys()
-    fields.remove('id')
-    return Species.objects.filter(instance_id=instance.id).values(*fields)
+    field_names = SpeciesImportRow.SPECIES_MAP.keys()
+    field_names.remove('id')
+    return Species.objects.filter(instance_id=instance.id).values(*field_names)
 
 
 @task_output_as_csv
@@ -740,19 +742,23 @@ def export_single_import(request, instance, import_type, import_event_id):
     ie = _get_import_event(instance, import_type, import_event_id)
 
     if import_type == SpeciesImportEvent.import_type:
-        filename, csv_fields = "species.csv", fields.species.ALL
+        filename = "species.csv"
+        field_names = fields.species.ALL
     else:
-        filename, csv_fields = "trees.csv", ie.ordered_legal_fields()
+        filename= "trees.csv"
+        field_names = ie.ordered_legal_fields()  # TODO: use ie's saved fields
 
-    return filename, get_import_export, (import_type, ie.pk,), csv_fields
+    return filename, get_import_export, (import_type, ie.pk,), field_names
 
 
 @task_output_as_csv
 def download_import_template(request, instance, import_type):
-    if import_type == 'tree':
-        filename = 'OpenTreeMap_Tree_Import_Template.csv'
-        f = fields.trees.ALL
-    else:
+    if import_type == SpeciesImportEvent.import_type:
         filename = 'OpenTreeMap_Species_Import_Template.csv'
-        f = fields.species.ALL
-    return filename, make_import_template, tuple(), f
+        field_names = fields.species.capitalize(fields.species.ALL)
+    else:
+        filename = 'OpenTreeMap_Tree_Import_Template.csv'
+        ie = TreeImportEvent(instance=instance)
+        field_names = ie.ordered_legal_fields_capitalized()
+
+    return filename, make_import_template, tuple(), field_names

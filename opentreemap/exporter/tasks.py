@@ -237,9 +237,9 @@ def _csv_field_header_map(field_names):
 
     for name in sorted(field_names):
         if name.startswith('udf:'):
-            header = 'planting site: ' + name[4:]
+            header = 'Planting Site: ' + name[4:]
         elif name.startswith('tree__udf:'):
-            header = 'tree: ' + name[10:]
+            header = 'Tree: ' + name[10:]
         else:
             # TODO: log that we have an uncaught field that may be
             # making re-imports impossible. This is better than crashing

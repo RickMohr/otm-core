@@ -62,6 +62,9 @@ class SpeciesImportEvent(GenericImportEvent):
         return (fields.species.ALL,
                 {fields.species.GENUS, fields.species.COMMON_NAME})
 
+    def legal_and_required_fields_capitalized(self):
+        return fields.species.capitalize(self.legal_and_required_fields())
+
 
 class SpeciesImportRow(GenericImportRow):
 

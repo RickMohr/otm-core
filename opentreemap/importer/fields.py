@@ -4,28 +4,60 @@ from __future__ import unicode_literals
 from __future__ import division
 
 
-class species(object):
+class FieldNames(object):
+    @classmethod
+    def downcase_names(cls):
+        # Much code expects lower-case field names, but we want to show
+        # capitalized field names in the UI and in exported CSV's.
+        # So downcase everything but create a dict to map back
+        # (from a lowercased field name to its capitalized original).
+        def is_string(t):
+            return t is str or t is unicode
+
+        for attr in cls.__dict__.keys():
+            if attr[:1] != '_' and not '__' in attr:
+                val = getattr(cls, attr)
+                t = type(val)
+                if is_string(t):
+                    cls._capitalized_field_names[val.lower()] = val
+                    val = val.lower()
+                    setattr(cls, attr, val)
+                elif t is list or t is tuple or t is set:
+                    if len(val) > 0 and is_string(type(next(iter(val)))):
+                        # val is a sequence of strings
+                        val = t(item.lower() for item in val)
+                        setattr(cls, attr, val)
+
+    @classmethod
+    def capitalize(cls, field_names):
+        t = type(field_names)
+        capitalized = t(cls._capitalized_field_names.get(n, n)
+                        for n in field_names)
+        return capitalized
+
+
+class species(FieldNames):
     # Fields of the OTM Species object
-    GENUS = 'genus'
-    SPECIES = 'species'
-    CULTIVAR = 'cultivar'
-    OTHER_PART_OF_NAME = 'other part of name'
-    COMMON_NAME = 'common name'
-    IS_NATIVE = 'is native'
-    FLOWERING_PERIOD = 'flowering period'
-    FRUIT_OR_NUT_PERIOD = 'fruit or nut period'
-    FALL_CONSPICUOUS = 'fall conspicuous'
-    FLOWER_CONSPICUOUS = 'flower conspicuous'
-    PALATABLE_HUMAN = 'palatable human'
-    HAS_WILDLIFE_VALUE = 'has wildlife value'
-    FACT_SHEET_URL = 'fact sheet url'
-    PLANT_GUIDE_URL = 'plant guide url'
-    MAX_DIAMETER = 'max diameter'
-    MAX_HEIGHT = 'max height'
+    GENUS = 'Genus'
+    SPECIES = 'Species'
+    CULTIVAR = 'Cultivar'
+    OTHER_PART_OF_NAME = 'Other Part of Name'
+    COMMON_NAME = 'Common Name'
+    IS_NATIVE = 'Is Native'
+    FLOWERING_PERIOD = 'Flowering Period'
+    FRUIT_OR_NUT_PERIOD = 'Fruit or Nut Period'
+    FALL_CONSPICUOUS = 'Fall Conspicuous'
+    FLOWER_CONSPICUOUS = 'Flower Conspicuous'
+    PALATABLE_HUMAN = 'Palatable Human'
+    HAS_WILDLIFE_VALUE = 'Has Wildlife Value'
+    FACT_SHEET_URL = 'Fact Sheet URL'
+    PLANT_GUIDE_URL = 'Plant Guide URL'
+    MAX_DIAMETER = 'Max Diameter'
+    MAX_HEIGHT = 'Max Height'
 
     # Other import and/or export fields
-    ID = 'database id of species'
-    ITREE_CODE = 'i-tree code'
+    ID = 'Database ID of Species'
+    ITREE_CODE = 'i-Tree Code'
 
     # This is a pseudo field which is filled in
     # when a matching species is found, but before
@@ -62,11 +94,13 @@ class species(object):
 
     PLOT_CHOICES = set()
 
+    _capitalized_field_names = {}
 
-class trees(object):
+
+class trees(FieldNames):
     # X/Y are required
-    POINT_X = 'point x'
-    POINT_Y = 'point y'
+    POINT_X = 'Point X'
+    POINT_Y = 'Point Y'
 
     # This is a pseudo field which is filled in
     # when data is cleaned and contains a GEOS
@@ -80,19 +114,19 @@ class trees(object):
     SPECIES_OBJECT = 'calc__species_object'
 
     # Plot Fields
-    STREET_ADDRESS = 'street address'
-    CITY_ADDRESS = 'city'
-    POSTAL_CODE = 'postal code'
-    PLOT_WIDTH = 'planting site width'
-    PLOT_LENGTH = 'planting site length'
+    STREET_ADDRESS = 'Street Address'
+    CITY_ADDRESS = 'City'
+    POSTAL_CODE = 'Postal Code'
+    PLOT_WIDTH = 'Planting Site Width'
+    PLOT_LENGTH = 'Planting Site Length'
 
     # TODO: READONLY restore when implemented
-    # READ_ONLY = 'read only'
+    # READ_ONLY = 'Read Only'
 
-    OPENTREEMAP_PLOT_ID = 'planting site id'
-    EXTERNAL_ID_NUMBER = 'owner original id'
+    OPENTREEMAP_PLOT_ID = 'Planting Site ID'
+    EXTERNAL_ID_NUMBER = 'Owner Original ID'
 
-    TREE_PRESENT = 'tree present'
+    TREE_PRESENT = 'Tree Present'
 
     # Tree Fields (species matching)
     GENUS = species.GENUS
@@ -102,11 +136,11 @@ class trees(object):
     COMMON_NAME = species.COMMON_NAME
 
     # Tree fields
-    DIAMETER = 'diameter'
-    TREE_HEIGHT = 'tree height'
-    CANOPY_HEIGHT = 'canopy height'
-    DATE_PLANTED = 'date planted'
-    DATE_REMOVED = 'date removed'
+    DIAMETER = 'Diameter'
+    TREE_HEIGHT = 'Tree Height'
+    CANOPY_HEIGHT = 'Canopy Height'
+    DATE_PLANTED = 'Date Planted'
+    DATE_REMOVED = 'Date Removed'
 
     # order matters, so this is a tuple and not a set
     SPECIES_FIELDS = (GENUS, SPECIES, CULTIVAR, OTHER_PART_OF_NAME,
@@ -154,3 +188,9 @@ class trees(object):
     # TODO: READONLY restore when implemented
     # Note: this is a tuple and not a set so it will be ordered in exports
     ALL = tuple([p[1] for p in EXPORTER_PAIRS])
+
+    _capitalized_field_names = {}
+
+
+species.downcase_names()
+trees.downcase_names()
