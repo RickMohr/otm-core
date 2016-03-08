@@ -751,8 +751,8 @@ def export_single_import(request, instance, import_type, import_event_id):
 def download_import_template(request, instance, import_type):
     if import_type == 'tree':
         filename = 'OpenTreeMap_Tree_Import_Template.csv'
-        f = fields.trees.ALL
+        f = fields.trees_capitalized.ALL
     else:
         filename = 'OpenTreeMap_Species_Import_Template.csv'
-        f = fields.species.ALL
+        f = fields.species_capitalized.ALL
     return filename, make_import_template, tuple(), f
