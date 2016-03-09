@@ -6,26 +6,26 @@ from __future__ import division
 
 class species(object):
     # Fields of the OTM Species object
-    GENUS = 'genus'
-    SPECIES = 'species'
-    CULTIVAR = 'cultivar'
-    OTHER_PART_OF_NAME = 'other part of name'
-    COMMON_NAME = 'common name'
-    IS_NATIVE = 'is native'
-    FLOWERING_PERIOD = 'flowering period'
-    FRUIT_OR_NUT_PERIOD = 'fruit or nut period'
-    FALL_CONSPICUOUS = 'fall conspicuous'
-    FLOWER_CONSPICUOUS = 'flower conspicuous'
-    PALATABLE_HUMAN = 'palatable human'
-    HAS_WILDLIFE_VALUE = 'has wildlife value'
-    FACT_SHEET_URL = 'fact sheet url'
-    PLANT_GUIDE_URL = 'plant guide url'
-    MAX_DIAMETER = 'max diameter'
-    MAX_HEIGHT = 'max height'
+    GENUS = 'Genus'
+    SPECIES = 'Species'
+    CULTIVAR = 'Cultivar'
+    OTHER_PART_OF_NAME = 'Other Part of Name'
+    COMMON_NAME = 'Common Name'
+    IS_NATIVE = 'Is Native'
+    FLOWERING_PERIOD = 'Flowering Period'
+    FRUIT_OR_NUT_PERIOD = 'Fruit or Nut Period'
+    FALL_CONSPICUOUS = 'Fall Conspicuous'
+    FLOWER_CONSPICUOUS = 'Flower Conspicuous'
+    PALATABLE_HUMAN = 'Palatable Human'
+    HAS_WILDLIFE_VALUE = 'Has Wildlife Value'
+    FACT_SHEET_URL = 'Fact Sheet URL'
+    PLANT_GUIDE_URL = 'Plant Guide URL'
+    MAX_DIAMETER = 'Max Diameter'
+    MAX_HEIGHT = 'Max Height'
 
     # Other import and/or export fields
-    ID = 'database id of species'
-    ITREE_CODE = 'i-tree code'
+    ID = 'Database ID of Species'
+    ITREE_CODE = 'i-Tree Code'
 
     # This is a pseudo field which is filled in
     # when a matching species is found, but before
@@ -65,8 +65,8 @@ class species(object):
 
 class trees(object):
     # X/Y are required
-    POINT_X = 'point x'
-    POINT_Y = 'point y'
+    POINT_X = 'Point X'
+    POINT_Y = 'Point Y'
 
     # This is a pseudo field which is filled in
     # when data is cleaned and contains a GEOS
@@ -80,33 +80,33 @@ class trees(object):
     SPECIES_OBJECT = 'calc__species_object'
 
     # Plot Fields
-    STREET_ADDRESS = 'street address'
-    CITY_ADDRESS = 'city'
-    POSTAL_CODE = 'postal code'
-    PLOT_WIDTH = 'planting site width'
-    PLOT_LENGTH = 'planting site length'
+    STREET_ADDRESS = 'Street Address'
+    CITY_ADDRESS = 'City'
+    POSTAL_CODE = 'Postal Code'
+    PLOT_WIDTH = 'Planting Site Width'
+    PLOT_LENGTH = 'Planting Site Length'
 
     # TODO: READONLY restore when implemented
-    # READ_ONLY = 'read only'
+    # READ_ONLY = 'Read Only'
 
-    OPENTREEMAP_PLOT_ID = 'planting site id'
-    EXTERNAL_ID_NUMBER = 'owner original id'
+    OPENTREEMAP_PLOT_ID = 'Planting Site ID'
+    EXTERNAL_ID_NUMBER = 'Owner Original ID'
 
-    TREE_PRESENT = 'tree present'
+    TREE_PRESENT = 'Tree Present'
 
     # Tree Fields (species matching)
-    GENUS = species.GENUS
-    SPECIES = species.SPECIES
-    CULTIVAR = species.CULTIVAR
-    OTHER_PART_OF_NAME = species.OTHER_PART_OF_NAME
-    COMMON_NAME = species.COMMON_NAME
+    GENUS = species_capitalized.GENUS
+    SPECIES = species_capitalized.SPECIES
+    CULTIVAR = species_capitalized.CULTIVAR
+    OTHER_PART_OF_NAME = species_capitalized.OTHER_PART_OF_NAME
+    COMMON_NAME = species_capitalized.COMMON_NAME
 
     # Tree fields
-    DIAMETER = 'diameter'
-    TREE_HEIGHT = 'tree height'
-    CANOPY_HEIGHT = 'canopy height'
-    DATE_PLANTED = 'date planted'
-    DATE_REMOVED = 'date removed'
+    DIAMETER = 'Diameter'
+    TREE_HEIGHT = 'Tree Height'
+    CANOPY_HEIGHT = 'Canopy Height'
+    DATE_PLANTED = 'Date Planted'
+    DATE_REMOVED = 'Date Removed'
 
     # order matters, so this is a tuple and not a set
     SPECIES_FIELDS = (GENUS, SPECIES, CULTIVAR, OTHER_PART_OF_NAME,
