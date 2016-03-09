@@ -414,7 +414,7 @@ def _add_species_resolver_to_fields(collected_fields, row):
                             and v.get('css_class'))
 
     for field, existing in species_error_fields:
-        species_text = row.datadict.get('genus')
+        species_text = row.field_value('genus')
         if species_text:
             existing['custom_resolver']['is_species'] = True
             instance = row.import_event.instance
@@ -448,7 +448,7 @@ def _get_row_data(row, field_names, merge_required, show_warnings):
                 field_data = collected_fields.get(field, {})
                 if not field_data or css_class == 'error':
                     field_data['name'] = field
-                    field_data['value'] = row.datadict.get(field, '')
+                    field_data['value'] = row.field_value(field, '')
                     field_data['css_class'] = css_class
                     if row_error['code'] != errors.MERGE_REQUIRED[0]:
                         field_data['show_resolver'] = True

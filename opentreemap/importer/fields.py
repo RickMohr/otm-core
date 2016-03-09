@@ -154,3 +154,20 @@ class trees(object):
     # TODO: READONLY restore when implemented
     # Note: this is a tuple and not a set so it will be ordered in exports
     ALL = tuple([p[1] for p in EXPORTER_PAIRS])
+
+
+def lower(val):
+    """
+    Return a copy of val with all strings converted to lowercase
+    """
+    def is_string(t):
+        return t is str or t is unicode
+
+    t = type(val)
+    if is_string(t):
+        val = val.lower()
+    elif t is list or t is tuple or t is set:
+        val = t(item.lower() for item in val if is_string(type(item)))
+
+    return val
+

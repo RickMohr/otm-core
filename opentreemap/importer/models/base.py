@@ -247,6 +247,9 @@ class GenericImportRow(models.Model):
         self.jsondata = v
         self.data = json.dumps(self.jsondata)
 
+    def field_value(self, field_name, default=None):
+        return self.field_value(field_name, default)
+
     def _errors_as_array(self):
         if self.errors is None or self.errors == '':
             return []
@@ -314,7 +317,7 @@ class GenericImportRow(models.Model):
 
     def safe_bool(self, fld):
         """ Returns a tuple of (success, bool value) """
-        v = self.datadict.get(fld, '').lower()
+        v = self.field_value(fld, '').lower()
 
         if v == '':
             return (True, None)
@@ -401,7 +404,7 @@ class GenericImportRow(models.Model):
         has_errors = False
         for field in self.model_fields.STRING_FIELDS:
 
-            value = self.datadict.get(field, None)
+            value = self.field_value(field, None)
             if value:
                 if len(value) > 255:
                     self.append_error(errors.STRING_TOO_LONG, field)
@@ -414,7 +417,7 @@ class GenericImportRow(models.Model):
     def validate_date_fields(self):
         has_errors = False
         for field in self.model_fields.DATE_FIELDS:
-            value = self.datadict.get(field, None)
+            value = self.field_value(field, None)
             if value:
                 try:
                     datep = datetime.strptime(value, '%Y-%m-%d')

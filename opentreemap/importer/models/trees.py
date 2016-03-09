@@ -16,6 +16,7 @@ from treemap.lib.object_caches import udf_defs
 
 from importer.models.base import GenericImportRow, GenericImportEvent
 from importer import fields
+from importer.fields import lower
 from importer import errors
 
 
@@ -61,9 +62,10 @@ class TreeImportEvent(GenericImportEvent):
         return fields.trees.ALL + plot_udfs + tree_udfs
 
     def legal_and_required_fields(self):
-        legal_fields = set(self.ordered_legal_fields())
+        legal_fields = set(lower(self.ordered_legal_fields()))
 
-        return (legal_fields, {fields.trees.POINT_X, fields.trees.POINT_Y})
+        return (legal_fields,
+                lower({fields.trees.POINT_X, fields.trees.POINT_Y}))
 
 
 class TreeImportRow(GenericImportRow):
@@ -331,11 +333,11 @@ class TreeImportRow(GenericImportRow):
 
     def validate_species(self):
         fs = fields.trees
-        genus = self.datadict.get(fs.GENUS, '')
-        species = self.datadict.get(fs.SPECIES, '')
-        cultivar = self.datadict.get(fs.CULTIVAR, '')
-        other_part = self.datadict.get(fs.OTHER_PART_OF_NAME, '')
-        common_name = self.datadict.get(fs.COMMON_NAME, '')
+        genus = self.field_value(fs.GENUS, '')
+        species = self.field_value(fs.SPECIES, '')
+        cultivar = self.field_value(fs.CULTIVAR, '')
+        other_part = self.field_value(fs.OTHER_PART_OF_NAME, '')
+        common_name = self.field_value(fs.COMMON_NAME, '')
 
         def append_species_error(error):
             error_fields = [genus, species, cultivar, other_part]
@@ -368,7 +370,7 @@ class TreeImportRow(GenericImportRow):
         ie = self.import_event
         for udf_def in udf_defs(ie.instance):
             column_name = ie.get_udf_column_name(udf_def)
-            value = self.datadict.get(column_name, None)
+            value = self.field_value(column_name, None)
             if value:
                 try:
                     udf_def.clean_value(value)

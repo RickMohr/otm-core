@@ -18,6 +18,7 @@ from treemap.species.codes import all_itree_region_codes
 
 from importer.models.base import GenericImportEvent, GenericImportRow
 from importer import fields
+from importer.fields import lower
 from importer import errors
 
 
@@ -59,8 +60,8 @@ class SpeciesImportEvent(GenericImportEvent):
             return super(SpeciesImportEvent, self).status_description()
 
     def legal_and_required_fields(self):
-        return (fields.species.ALL,
-                {fields.species.GENUS, fields.species.COMMON_NAME})
+        return (lower(fields.species.ALL),
+                lower({fields.species.GENUS, fields.species.COMMON_NAME}))
 
 
 class SpeciesImportRow(GenericImportRow):
@@ -164,10 +165,10 @@ class SpeciesImportRow(GenericImportRow):
         # genus='Prunus' (species/genus/other blank), which matches
         # both 'Plum' and 'Cherry'
 
-        genus = self.datadict.get(fields.species.GENUS, '')
-        species = self.datadict.get(fields.species.SPECIES, '')
-        cultivar = self.datadict.get(fields.species.CULTIVAR, '')
-        other_part = self.datadict.get(fields.species.OTHER_PART_OF_NAME, '')
+        genus = self.field_value(fields.species.GENUS, '')
+        species = self.field_value(fields.species.SPECIES, '')
+        cultivar = self.field_value(fields.species.CULTIVAR, '')
+        other_part = self.field_value(fields.species.OTHER_PART_OF_NAME, '')
 
         if genus != '' or species != '' or cultivar != '' or other_part != '':
             matching_species = Species.objects.filter(
@@ -181,7 +182,7 @@ class SpeciesImportRow(GenericImportRow):
                 # Try using row's common name to disambiguate. Note that it
                 # might not match (and so require a merge) (which is why we
                 # didn't use it above).
-                common_name = self.datadict.get(fields.species.COMMON_NAME, '')
+                common_name = self.field_value(fields.species.COMMON_NAME, '')
                 match_common_name = matching_species.filter(
                     common_name__iexact=common_name)
                 if match_common_name.count() == 1:
@@ -235,7 +236,7 @@ class SpeciesImportRow(GenericImportRow):
         return error, region
 
     def validate_itree_code_field(self):
-        itree_code = self.datadict.get(fields.species.ITREE_CODE)
+        itree_code = self.field_value(fields.species.ITREE_CODE)
         if not itree_code:
             return
 
