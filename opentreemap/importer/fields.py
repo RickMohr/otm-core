@@ -95,11 +95,11 @@ class trees(object):
     TREE_PRESENT = 'Tree Present'
 
     # Tree Fields (species matching)
-    GENUS = species_capitalized.GENUS
-    SPECIES = species_capitalized.SPECIES
-    CULTIVAR = species_capitalized.CULTIVAR
-    OTHER_PART_OF_NAME = species_capitalized.OTHER_PART_OF_NAME
-    COMMON_NAME = species_capitalized.COMMON_NAME
+    GENUS = species.GENUS
+    SPECIES = species.SPECIES
+    CULTIVAR = species.CULTIVAR
+    OTHER_PART_OF_NAME = species.OTHER_PART_OF_NAME
+    COMMON_NAME = species.COMMON_NAME
 
     # Tree fields
     DIAMETER = 'Diameter'
