@@ -2,6 +2,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
 
+from treemap.audit import Audit
 from treemap.lib.object_caches import role_permissions
 
 from django.contrib.gis.db.models import Field
@@ -146,8 +147,6 @@ def is_deletable(instanceuser, obj):
     if _invalid_instanceuser(instanceuser):
         return False
     else:
-        # TODO: factor this off user and roll it into
-        # this module
         return obj.user_can_delete(instanceuser.user)
 
 
@@ -200,13 +199,6 @@ def map_feature_is_writable(role_related_obj, model_obj, field=None):
                         model_obj.__class__.__name__,
                         perm_attr=ALLOWS_WRITES,
                         predicate=any, field=field)
-
-
-def map_feature_is_deletable(role_related_obj, model_obj):
-    return _allows_perm(role_related_obj,
-                        model_obj.__class__.__name__,
-                        perm_attr=ALLOWS_WRITES,
-                        predicate=all)
 
 
 def plot_is_writable(role_related_obj, field=None):
