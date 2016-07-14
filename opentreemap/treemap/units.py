@@ -24,12 +24,10 @@ class Convertible(object):
 
     @classmethod
     def terminology(cls, instance=None):
-        terms = copy.copy(cls._terminology)
-        if instance:
-            terms.update(instance.config
-                         .get('terms', {})
-                         .get(cls.__name__, {}))
-        return terms
+        # Classes like Tree and MapFeaturePhoto have terminology
+        # (for translation purposes) but are not subclasses of MapFeature
+        # (which defines this method for other classes with terminology)
+        return getattr(cls, "_terminology", {})
 
     @classmethod
     def display_name(cls, instance):

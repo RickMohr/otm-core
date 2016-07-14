@@ -89,9 +89,11 @@ class Bioswale(PolygonalMapFeature):
         }
     }
 
-    _terminology = {
+    default_config = {
         'singular': _('Bioswale'),
         'plural': _('Bioswales'),
+        'should_show_eco': True,
+        'diversion_rate': 0.95,
     }
 
 
@@ -136,9 +138,11 @@ class RainGarden(PolygonalMapFeature):
         },
     }
 
-    _terminology = {
+    default_config = {
         'singular': _('Rain Garden'),
         'plural': _('Rain Gardens'),
+        'should_show_eco': True,
+        'diversion_rate': 0.95,
     }
 
 
@@ -148,9 +152,10 @@ class RainBarrel(MapFeature):
         verbose_name=_("Capacity"),
         error_messages={'invalid': _("Please enter a number.")})
 
-    _terminology = {
+    default_config = {
         'singular': _('Rain Barrel'),
         'plural': _('Rain Barrels'),
+        'should_show_eco': False,
     }
 
     @classproperty

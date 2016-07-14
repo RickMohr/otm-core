@@ -257,7 +257,8 @@ class Instance(models.Model):
 
     scss_variables = _make_config_property('scss_variables')
 
-    map_feature_types = _make_config_property('map_feature_types', ['Plot'])
+    map_feature_config = _make_config_property('map_feature_config',
+                                               {'Plot': {}})
 
     mobile_search_fields = _make_config_property('mobile_search_fields',
                                                  DEFAULT_MOBILE_SEARCH_FIELDS)
@@ -300,6 +301,10 @@ class Instance(models.Model):
         from treemap.udf import UserDefinedFieldDefinition
         return UserDefinedFieldDefinition.objects.filter(
             instance=self, iscollection=True)
+
+    @property
+    def map_feature_types(self):
+        return self.map_feature_config.keys()
 
     @property
     def has_resources(self):
@@ -450,7 +455,10 @@ class Instance(models.Model):
                 # non-plot mobile_api_fields are not currently
                 # supported, but when they are added, they should
                 # also be removed here.
-        self.map_feature_types = remaining_types
+
+        config = self.map_feature_config
+        self.map_feature_config = {name: config[name]
+                                   for name in remaining_types}
         self.save()
 
     @transaction.atomic
@@ -458,15 +466,16 @@ class Instance(models.Model):
         from treemap.models import MapFeature  # prevent circular import
         from treemap.audit import add_default_permissions
 
-        classes = [MapFeature.get_subclass(type) for type in types]
-
         dups = set(types) & set(self.map_feature_types)
         if len(dups) > 0:
             raise ValidationError('Map feature types already added: %s' % dups)
 
-        self.map_feature_types = list(self.map_feature_types) + list(types)
+        config = {name: {} for name in types}
+        config.update(self.map_feature_config)
+        self.map_feature_config = config
         self.save()
 
+        classes = [MapFeature.get_subclass(type) for type in types]
         for type, clz in zip(types, classes):
             settings = (getattr(clz, 'udf_settings', {}))
             for udfc_name, udfc_settings in settings.items():

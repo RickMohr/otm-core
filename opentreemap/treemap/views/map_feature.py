@@ -126,7 +126,7 @@ def plot_detail(request, instance, feature_id, edit=False, tree_id=None):
 
 
 def render_map_feature_add(request, instance, type):
-    if type in instance.map_feature_types[1:]:
+    if type in instance.map_feature_types and type != 'Plot':
         app = MapFeature.get_subclass(type).__module__.split('.')[0]
         try:
             template = '%s/%s_add.html' % (app, type)

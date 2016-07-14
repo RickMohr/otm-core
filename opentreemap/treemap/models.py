@@ -674,6 +674,25 @@ class MapFeature(Convertible, UDFModel, PendingAuditable):
         except KeyError as e:
             raise ValidationError('Map feature type %s not found' % e)
 
+    @classmethod
+    def get_map_feature_config_attr(cls, attr, instance):
+        # Use instance's override if present, else class default
+        value = None
+        if instance is not None:
+            value = instance.map_feature_config[cls.__name__].get(attr)
+        if value is None:
+            value = cls.default_config.get(attr)
+        return value
+
+    @classmethod
+    def terminology(cls, instance=None):
+        terms = {}
+        for attr in ['singular', 'plural']:
+            value = cls.get_map_feature_config_attr(attr, instance)
+            if value:
+                terms[attr] = value
+        return terms
+
     @property
     def address_full(self):
         components = []
@@ -776,10 +795,6 @@ class MapFeature(Convertible, UDFModel, PendingAuditable):
         return text
 
     @classproperty
-    def _terminology(cls):
-        return {'singular': cls.__name__}
-
-    @classproperty
     def benefits(cls):
         from treemap.ecobenefits import CountOnlyBenefitCalculator
         return CountOnlyBenefitCalculator(cls)
@@ -836,8 +851,8 @@ class Plot(MapFeature, ValidationMixin):
     objects = GeoHStoreUDFManager()
     is_editable = True
 
-    _terminology = {'singular': _('Planting Site'),
-                    'plural': _('Planting Sites')}
+    default_config = {'singular': _('Planting Site'),
+                      'plural': _('Planting Sites')}
 
     udf_settings = {
         'Stewardship': {

@@ -16,7 +16,7 @@ from stormwater.models import Bioswale
 @override_settings(FEATURE_BACKEND_FUNCTION=None)
 class UdfGenericCreateTest(UdfCRUTestCase):
     def test_non_treemap_model(self):
-        self.instance.map_feature_types += ['Bioswale']
+        self.instance.add_map_feature_types(['Bioswale'])
         self.instance.save()
 
         body = {'udf.name': 'Testing choice',
