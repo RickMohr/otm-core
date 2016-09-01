@@ -102,6 +102,8 @@ function init() {
         } else {
             resourceDetail.init(form);
         }
+
+        $('[data-date-format]').datepicker();
     }
 
     initDetail(form);
@@ -228,8 +230,6 @@ function init() {
             e.preventDefault();
         });
     }
-
-    $('[data-date-format]').datepicker();
 
     socialMediaSharing.init({imageFinishedStream: imageFinishedStream});
 }
