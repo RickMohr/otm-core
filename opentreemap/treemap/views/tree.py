@@ -118,6 +118,12 @@ def search_tree_benefits(request, instance):
                                                 filter)
     }
     context.update(formatted)
+
+    render_template('treemap/partials/eco_benefits.html'),
+
+    resp = render_to_response(template, params,
+                              RequestContext(request), **kwargs)
+
     return context
 
 

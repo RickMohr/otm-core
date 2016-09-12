@@ -206,9 +206,9 @@ delete_tree = do(
 tree_detail = instance_request(tree_views.tree_detail)
 
 search_tree_benefits = do(
+    json_api_call,
     instance_request,
     etag(tree_views.search_hash),
-    render_template('treemap/partials/eco_benefits.html'),
     tree_views.search_tree_benefits)
 
 add_tree_photo = add_map_feature_photo_do(tree_views.add_tree_photo)
