@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "autotrack": "^0.6.5",
-    "baconjs": "~0.6",
+    "baconjs": "~0.7",
     "console-browserify": "~1.0.1",
     "dragula": "^2.0.2",
     "esri-leaflet": "~1.0.2",
