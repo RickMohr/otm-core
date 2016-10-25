@@ -288,9 +288,11 @@ function getBasemapLayers(type) {
 }
 
 function trackZoomLatLng(options, map, mapManager) {
-    var zoomLatLngOutputStream =
+    var shouldOutput = false,
+        zoomLatLngOutputStream =
         BU.leafletEventStream(map, 'moveend')
-            .map(function () {
+            .filter(shouldOutput)
+            .map(function (e) {
                 var zoomLatLng = _.extend({zoom: map.getZoom()}, map.getCenter());
                 return zoomLatLng;
             });
@@ -310,9 +312,11 @@ function trackZoomLatLng(options, map, mapManager) {
 
         zoomLatLngInputStream.onValue(function (zoomLatLng) {
             if (!_.isEmpty(zoomLatLng)) {
+                shouldOutput = false;
                 mapManager.setCenterAndZoomLL(
                     zoomLatLng.zoom,
                     new L.LatLng(zoomLatLng.lat, zoomLatLng.lng));
+                shouldOutput = true;
             }
         });
     }
