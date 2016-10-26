@@ -288,14 +288,14 @@ function getBasemapLayers(type) {
 }
 
 function trackZoomLatLng(options, map, mapManager) {
-    var shouldOutput = false,
+    var shouldOutput = true,
         zoomLatLngOutputStream =
-        BU.leafletEventStream(map, 'moveend')
-            .filter(shouldOutput)
-            .map(function (e) {
-                var zoomLatLng = _.extend({zoom: map.getZoom()}, map.getCenter());
-                return zoomLatLng;
-            });
+            BU.leafletEventStream(map, 'moveend')
+                .filter(function () {return shouldOutput;})
+                .map(function (e) {
+                    var zoomLatLng = _.extend({zoom: map.getZoom()}, map.getCenter());
+                    return zoomLatLng;
+                });
 
     if (options.trackZoomLatLng) {
         var zoomLatLngInputStream;
