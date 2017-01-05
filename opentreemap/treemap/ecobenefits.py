@@ -327,6 +327,23 @@ def compute_currency_and_transform_units(instance, benefits):
     return {'plot': rslt}
 
 
+def get_total_currency(benefits):
+    # Compute total currency saved (except CO2 stored).
+    # Return it as if it were a normal benefit so we'll get formatting
+    # and currency conversion.
+    total_currency_saved = 0
+    for benefit_name, benefit in benefits.iteritems():
+        if benefit_name != BenefitCategory.CO2STORAGE:
+            currency = benefit.get('currency', 0.0)
+            if currency:
+                total_currency_saved += currency
+    return {
+        'value': None,
+        'currency': total_currency_saved,
+        'label': _('Total annual benefits')
+    }
+
+
 #TODO: Does this helper exist?
 def _sum_dict(d1, d2):
     if d1 is None:

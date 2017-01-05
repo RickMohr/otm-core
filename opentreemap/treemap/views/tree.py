@@ -15,7 +15,7 @@ from django.http import HttpResponseRedirect
 from treemap.search import Filter
 from treemap.models import Tree, Plot
 from treemap.audit import Audit
-from treemap.ecobenefits import get_benefits_for_filter
+from treemap.ecobenefits import get_benefits_for_filter, get_total_currency
 from treemap.ecobenefits import BenefitCategory
 from treemap.ecocache import get_cached_plot_count
 from treemap.lib import format_benefits
@@ -71,23 +71,9 @@ def search_tree_benefits(request, instance):
     # Inject the plot count as a basis for tree benefit calcs
     basis.get('plot', {})['n_plots'] = total_plots
 
-    # We also want to inject the total currency amount saved
-    # for plot-based items except CO2 stored
-    total_currency_saved = 0
-
-    for benefit_name, benefit in benefits.get('plot', {}).iteritems():
-        if benefit_name != BenefitCategory.CO2STORAGE:
-            currency = benefit.get('currency', 0.0)
-            if currency:
-                total_currency_saved += currency
-
-    # save it as if it were a normal benefit so we get formatting
-    # and currency conversion
-    benefits.get('plot', {})['totals'] = {
-        'value': None,
-        'currency': total_currency_saved,
-        'label': _('Total annual benefits')
-    }
+    # Inject total currency amount saved
+    plot_benefits = benefits.get('plot', {})
+    plot_benefits['totals'] = get_total_currency(plot_benefits)
 
     formatted = format_benefits(instance, benefits, basis, digits=0)
 
