@@ -2,7 +2,9 @@
 
 var L = require('leaflet'),
     _ = require('lodash'),
+    Bacon = require('baconjs'),
     U = require('treemap/lib/utility.js'),
+    numeral = require('numeral'),
     config = require('treemap/lib/config.js');
 
 require('leaflet-draw');
@@ -25,12 +27,13 @@ function flipXY(coordinates) {
 }
 
 module.exports = function (options) {
-    var areaPolygon,
-        points;
+    var map = options.mapManager.map,
+        areaPolygon,
+        points,
+        initialArea,
+        areaBus = new Bacon.Bus();
 
     return {
-
-        mapManager: options.mapManager,
 
         initAreaPolygon: function(options) {
             if ((options.points && options.plotMarker) ||
@@ -42,7 +45,8 @@ module.exports = function (options) {
                 points = makePolygonFromPoint(options.plotMarker.getLatLng());
             }
             areaPolygon = new L.Polygon(flipXY(points));
-            areaPolygon.addTo(this.mapManager.map);
+            areaPolygon.addTo(map);
+            initialArea = U.getPolygonDisplayArea(areaPolygon);
         },
 
         getPoints: function () {
@@ -73,7 +77,7 @@ module.exports = function (options) {
         removeAreaPolygon: function() {
             if (areaPolygon) {
                 this.disableAreaPolygon();
-                this.mapManager.map.removeLayer(areaPolygon);
+                map.removeLayer(areaPolygon);
                 areaPolygon = null;
             }
         },
@@ -83,12 +87,23 @@ module.exports = function (options) {
                 this.initAreaPolygon(options);
             }
             areaPolygon.editing.enable();
+
+            map.on('draw:editvertex', function () {
+                var area = U.getPolygonDisplayArea(areaPolygon),
+                    displayArea = numeral(area).format('0,0');
+                areaBus.push(displayArea);
+            });
         },
 
         disableAreaPolygon: function() {
             if (areaPolygon) {
                 areaPolygon.editing.disable();
+                map.off('draw:editvertex');
+                var displayArea = numeral(initialArea).format('0,0');
+                areaBus.push(displayArea);
             }
-        }
+        },
+
+        areaStream: areaBus.map(_.identity)
     };
 };

@@ -42,6 +42,7 @@ var dom = {
             edit: '#edit-location',
             cancel: '#cancel-edit-location',
         },
+        polygonAreaDisplay: '.js-area'
     };
 
 function init() {
@@ -169,6 +170,7 @@ function init() {
 
     if (window.otm.mapFeature.isEditablePolygon) {
         currentMover = geometryMover.polygonMover(moverOptions);
+        currentMover.editor.areaStream.onValue(showUpdatedArea);
     } else {
         plotMarker.init(mapManager.map);
         plotMarker.useTreeIcon(window.otm.mapFeature.useTreeIcon);
@@ -255,6 +257,10 @@ function handleFavoriteClick() {
             e.preventDefault();
         });
     }
+}
+
+function showUpdatedArea(area) {
+    $(dom.polygonAreaDisplay).html(area);
 }
 
 init();

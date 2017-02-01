@@ -129,6 +129,14 @@ exports.offsetLatLngByMeters = function(latLng, dx, dy) {
     return { lat: newLat, lng: newLng };
 };
 
+// TODO: Respect instance units configuration.
+exports.getPolygonDisplayArea = function(poly) {
+    var latLngs = poly.getLatLngs()[0],
+        areaSqMeters = L.GeometryUtil.geodesicArea(latLngs),
+        areaSqFeet = areaSqMeters * 10.7639;
+    return areaSqFeet;
+}
+
 var endsWith = exports.endsWith = function(str, ends) {
     if (ends === '') return true;
     if (str === null || ends === null) return false;
