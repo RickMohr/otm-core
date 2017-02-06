@@ -19,13 +19,13 @@ function init(obj, options) {
             $editLocationButton.show();
         } else { // in display mode
             $editLocationButton.hide();
-            obj.disable();
         }
         $cancelEditLocationButton.hide();
     });
 
     inlineEditForm.cancelStream.onValue(function () {
         obj.onCancel();
+        obj.disable();
     });
 
     $editLocationButton.click(function () {
@@ -47,6 +47,8 @@ function init(obj, options) {
         .saveOkStream
         .map('.responseData')
         .onValue(function (responseData) {
+            obj.onSaveOk(responseData.feature);
+            obj.disable();
             // Refresh the map if needed
             options.mapManager.updateRevHashes(responseData);
         });
@@ -56,7 +58,7 @@ function extendBase(overrides) {
     var _isEnabled = false,
         obj = _.extend({
             onSaveBefore: _.noop,
-            onSaveAfter: _.noop,
+            onSaveOk: _.noop,
             onCancel: _.noop,
             enable: _.noop,
             disable: _.noop,
@@ -90,15 +92,16 @@ exports.plotMover = function(options) {
             }
         },
 
-        onSaveAfter: function (data) {
+        onSaveOk: function (feature) {
             var wasInPmf = $('#containing-polygonalmapfeature').length > 0,
-                isNowInPmf = data.feature.containing_polygonalmapfeature;
+                isNowInPmf = feature.containing_polygonalmapfeature;
             if (this.plotMarker.wasMoved() && (wasInPmf || isNowInPmf)) {
                 window.location.reload();
             } else {
                 // Form successfully saved its data. Update cached location.
                 this.location = this.plotMarker.getLocation();
             }
+            this.disable();
         },
 
         onCancel: function () {
@@ -133,9 +136,9 @@ exports.polygonMover = function (options) {
             }
         },
 
-        onSaveAfter: function (data) {
+        onSaveOk: function (feature) {
             var didContainPlots = $('#contained-plots').length > 0,
-                nowContainsPlots = data.feature.contained_plots.length > 0,
+                nowContainsPlots = feature.contained_plots.length > 0,
                 points;
             if (this.editor.hasMoved(this.location) &&
                 (didContainPlots || nowContainsPlots)) {
