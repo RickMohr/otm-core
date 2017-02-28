@@ -5,7 +5,10 @@ var $ = require('jquery'),
     L = require('leaflet');
 
 var dom = {
+    locationInput: '#boundary-typeahead',
+    drawArea: '.draw-area',
     clearLocationSearch: '.clear-location-search',
+    clearCustomArea: '.clear-custom-area',
     controls: {
         standard: '#location-search-well',
         drawArea: '#draw-area-controls',
@@ -19,7 +22,15 @@ var map,
 
 function init(options) {
     map = options.map;
+    $(dom.locationInput).on('keyup', showAppropriateButton);
+    $(dom.clearCustomArea).click(clearCustomArea);
     $(dom.clearLocationSearch).click(clearLocationSearch);
+}
+
+function showAppropriateButton() {
+    var hasValue = ($(dom.locationInput).val().length > 0);
+    $(dom.drawArea).toggle(!hasValue);
+    $(dom.clearLocationSearch).toggle(hasValue);
 }
 
 function getPolygon() {
@@ -31,6 +42,11 @@ function setPolygon(newPolygon) {
 }
 
 function clearLocationSearch() {
+    $(dom.locationInput).val('');
+    showAppropriateButton();
+}
+
+function clearCustomArea() {
     if (polygon) {
         map.removeLayer(polygon);
         polygon = null;

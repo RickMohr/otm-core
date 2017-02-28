@@ -47,6 +47,7 @@ var dom = {
     speciesSearchToggle: '#species-toggle',
     speciesSearchContainer: '#species-search-wrapper',
     locationSearchTypeahead: '#boundary-typeahead',
+    clearLocationSearch: '.clear-location-search',
     foreignKey: '[data-foreign-key]',
 };
 
@@ -85,32 +86,47 @@ function redirectToSearchPage(filters, wmCoords) {
     window.location.href = reverse.map(config.instance.url_name) + '?' + query;
 }
 
+function initTopTypeaheads() {
+    var speciesTypeahead = otmTypeahead.create({
+            name: "species",
+            url: reverse.species_list_view(config.instance.url_name),
+            input: "#species-typeahead",
+            template: "#species-element-template",
+            hidden: "#search-species",
+            button: "#species-toggle",
+            reverse: "id",
+            forceMatch: true
+        }),
+        locationTypeahead = otmTypeahead.create({
+            name: "boundaries",
+            url: reverse.boundary_list(config.instance.url_name),
+            input: "#boundary-typeahead",
+            template: "#boundary-element-template",
+            hidden: "#boundary",
+            button: "#boundary-toggle",
+            reverse: "id",
+            sortKeys: ['sortOrder', 'value'],
+            geocoder: true,
+            geocoderBbox: config.instance.extent
+        }),
+        clearLocationSearchStream = $(dom.clearLocationSearch).asEventStream('click'),
+        triggerSearchStream = Bacon.mergeAll(
+            speciesTypeahead.selectStream,
+            locationTypeahead.selectStream,
+            clearLocationSearchStream
+        );
+
+    clearLocationSearchStream.onValue(function () {
+        locationTypeahead.clear();
+    });
+
+    return triggerSearchStream;
+}
+
 function initSearchUi(searchStream) {
     var $advancedToggle = $(dom.advancedToggle),
         $header = $(dom.header),
         $subheader = $(dom.subheader);
-    otmTypeahead.create({
-        name: "species",
-        url: reverse.species_list_view(config.instance.url_name),
-        input: "#species-typeahead",
-        template: "#species-element-template",
-        hidden: "#search-species",
-        button: "#species-toggle",
-        reverse: "id",
-        forceMatch: true
-    });
-    otmTypeahead.create({
-        name: "boundaries",
-        url: reverse.boundary_list(config.instance.url_name),
-        input: "#boundary-typeahead",
-        template: "#boundary-element-template",
-        hidden: "#boundary",
-        button: "#boundary-toggle",
-        reverse: "id",
-        sortKeys: ['sortOrder', 'value'],
-        geocoder: true,
-        geocoderBbox: config.instance.extent
-    });
 
     var $query_typeaheads = $('.search-right .autocomplete-group');
     $query_typeaheads.each(function () {
@@ -358,10 +374,11 @@ module.exports = exports = {
     },
 
     init: function () {
-        var searchStream = BU.enterOrClickEventStream({
-                inputs: 'input[data-class="search"]',
-                button: '#perform-search,#location-perform-search'
-            }),
+        var searchStream = Bacon.mergeAll(
+                initTopTypeaheads(),
+                BU.enterOrClickEventStream({
+                    inputs: 'input[data-class="search"]',
+                    button: '#perform-search,#location-perform-search'})),
             resetStream = $("#search-reset").asEventStream("click"),
             searchFiltersProp = searchStream.map(Search.buildSearch).toProperty(),
             filtersStream = searchStream

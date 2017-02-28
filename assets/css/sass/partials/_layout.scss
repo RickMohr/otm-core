@@ -281,8 +281,13 @@ body {
         &.no-hamburger {
             padding-left: 8px;
         }
+
     }
-    .typeahead-toggle, .draw-area {
+    #boundary-typeahead {
+        padding-right: 28px;
+    }
+
+    .typeahead-toggle, a {
         padding: 9px 4px 7px;
         position: absolute;
         top: 0px;
@@ -300,10 +305,10 @@ body {
             color: $main-text-color;
         }
     }
-    .draw-area {
+    .draw-area, .clear-location-search {
         right: 0px;
     }
-    .search-button {
+    .search-button, .clear-location-search {
         display: none;
     }
 }
@@ -323,7 +328,7 @@ body {
     .text {
         font-size: 1.2rem;
     }
-    .clear-location-search, .cancel-draw {
+    .clear-custom-area, .cancel-draw {
         float: right;
     }
     .controls {
