@@ -81,6 +81,7 @@ var create = exports.create = function(options) {
 
         setTypeahead = function($typeahead, val) {
             $typeahead.typeahead('val', val);
+            $input.trigger('input');
         },
 
         prefetchEngine,
