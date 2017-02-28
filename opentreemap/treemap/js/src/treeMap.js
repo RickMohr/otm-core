@@ -89,7 +89,8 @@ modes.init(mapManager, triggerSearchFromSidebar, mapPage.embed,
     completedEcobenefitsSearchStream);
 
 adHocPolygon.init({
-    map: mapManager.map
+    map: mapManager.map,
+    searchBar: mapPage.searchBar
 });
 
 // Read state from current URL, initializing

@@ -305,10 +305,10 @@ body {
             color: $main-text-color;
         }
     }
-    .draw-area, .clear-location-search {
+    .draw-area, .clear-location-input {
         right: 0px;
     }
-    .search-button, .clear-location-search {
+    .search-button, .clear-location-input {
         display: none;
     }
 }
@@ -328,7 +328,7 @@ body {
     .text {
         font-size: 1.2rem;
     }
-    .clear-custom-area, .cancel-draw {
+    .clear-custom-area, .clear-location-search, .cancel-draw {
         float: right;
     }
     .controls {

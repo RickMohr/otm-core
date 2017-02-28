@@ -419,11 +419,11 @@ module.exports = exports = {
             // the final, pinpointed stream of geocoded locations
             // consumers should act with this data directly to
             // modify the state of their UI or pass to other consumers.
-            geocodedLocationStream: geocodedLocationStream,
+            geocodedLocationStream: geocodedLocationStream.log('gls'),
 
             // Stream of search events, carries the filter object and display
             // list with it. should be used by consumer to execute searches.
-            filterNonGeocodeObjectStream: filtersStream,
+            filterNonGeocodeObjectStream: filtersStream.log('fngos'),
 
             // Current value of search filters updated every time the
             // "Search" button is pressed.
