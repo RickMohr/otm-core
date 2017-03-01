@@ -115,7 +115,7 @@ function initTopTypeaheads() {
         clearLocationSearchStream = $(dom.clearLocationSearch).asEventStream('click'),
         triggerSearchStream = Bacon.mergeAll(
             speciesTypeahead.selectStream,
-            locationTypeahead.selectStream,
+            locationTypeahead.selectStream.log('yo'),
             clearLocationSearchStream
         );
 
@@ -426,11 +426,11 @@ module.exports = exports = {
             // the final, pinpointed stream of geocoded locations
             // consumers should act with this data directly to
             // modify the state of their UI or pass to other consumers.
-            geocodedLocationStream: geocodedLocationStream.log('gls'),
+            geocodedLocationStream: geocodedLocationStream,
 
             // Stream of search events, carries the filter object and display
             // list with it. should be used by consumer to execute searches.
-            filterNonGeocodeObjectStream: filtersStream.log('fngos'),
+            filterNonGeocodeObjectStream: filtersStream,
 
             // Current value of search filters updated every time the
             // "Search" button is pressed.

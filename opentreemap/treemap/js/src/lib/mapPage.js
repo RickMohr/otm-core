@@ -71,7 +71,6 @@ module.exports.init = function (options) {
     return {
         mapManager: mapManager,
         map: mapManager.map,
-        searchBar: searchBar,
         embed: !!embed,
         builtSearchEvents: builtSearchEvents,
         getMapStateSearch: urlState.getSearch,

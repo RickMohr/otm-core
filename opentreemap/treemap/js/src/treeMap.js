@@ -90,7 +90,7 @@ modes.init(mapManager, triggerSearchFromSidebar, mapPage.embed,
 
 locationSearchUI.init({
     map: mapManager.map,
-    searchBar: mapPage.searchBar
+    builtSearchEvents: mapPage.builtSearchEvents
 });
 
 // Read state from current URL, initializing

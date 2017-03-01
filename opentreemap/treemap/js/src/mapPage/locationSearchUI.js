@@ -1,16 +1,13 @@
 "use strict";
 
 var $ = require('jquery'),
-    _ = require('lodash'),
-    Bacon = require('baconjs');
+    _ = require('lodash');
 
 var dom = {
     locationInput: '#boundary-typeahead',
-    locationHidden: '#boundary',
     locationSearched: '#location-searched .text',
     drawArea: '.draw-area',
     clearLocationInput: '.clear-location-input',
-    clearLocationSearch: '.clear-location-search',
     clearCustomArea: '.clear-custom-area',
     controls: {
         standard: '#location-search-well',
@@ -22,24 +19,15 @@ var dom = {
 };
 
 var map,
-    searchBar,
     polygon;
 
 function init(options) {
     map = options.map;
-    searchBar = options.searchBar;
     $(dom.locationInput).on('input', showAppropriateWellButton);
+    $(dom.clearLocationInput).click(clearLocationInput);
     $(dom.clearCustomArea).click(clearCustomArea);
 
-    // Note these also have handlers in searchBar.js, which trigger a search
-    $(dom.clearLocationInput).click(clearLocationInput);
-    $(dom.clearLocationSearch).click(clearLocationSearch);
-
-    Bacon.mergeAll(
-        searchBar.geocodedLocationStream,
-        searchBar.filterNonGeocodeObjectStream,
-        $(dom.locationHidden).asEventStream('restore')
-    ).onValue(showSearchedLocation);
+    options.builtSearchEvents.onValue(onSearchChanged);
 }
 
 function showAppropriateWellButton() {
@@ -48,10 +36,20 @@ function showAppropriateWellButton() {
     $(dom.clearLocationInput).toggle(hasValue);
 }
 
-function showSearchedLocation() {
+function clearLocationInput() {
+    $(dom.locationInput).val('');
+    showAppropriateWellButton();
+}
+
+function onSearchChanged() {
     var text = $(dom.locationInput).val();
-    $(dom.locationSearched).html(text);
-    showControls(text ? dom.controls.searched : dom.controls.standard);
+    if (text) {
+        showControls(dom.controls.searched);
+        $(dom.locationSearched).html(text);
+    } else {
+        showControls(dom.controls.standard);
+        showAppropriateWellButton();
+    }
 }
 
 function getPolygon() {
@@ -60,16 +58,6 @@ function getPolygon() {
 
 function setPolygon(newPolygon) {
     polygon = newPolygon.addTo(map);
-}
-
-function clearLocationInput() {
-    $(dom.locationInput).val('');
-    showAppropriateWellButton();
-}
-
-function clearLocationSearch() {
-    showAppropriateWellButton();
-    showControls(dom.controls.standard);
 }
 
 function clearCustomArea() {
