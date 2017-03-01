@@ -27,7 +27,7 @@ var map,
 function init(options) {
     map = options.map;
     searchBar = options.searchBar;
-    $(dom.locationInput).on('keyup', showAppropriateButton);
+    // $(dom.locationInput).on('keyup', showAppropriateButton);
     $(dom.clearCustomArea).click(clearCustomArea);
     $(dom.clearLocationInput).click(clearLocationInput);
     $(dom.clearLocationSearch).click(clearLocationSearch);
@@ -37,11 +37,11 @@ function init(options) {
     ).onValue(showSearchedLocation);
 }
 
-function showAppropriateButton() {
-    var hasValue = ($(dom.locationInput).val().length > 0);
-    $(dom.drawArea).toggle(!hasValue);
-    $(dom.clearLocationInput).toggle(hasValue);
-}
+// function showAppropriateButton() {
+//     var hasValue = ($(dom.locationInput).val().length > 0);
+//     $(dom.drawArea).toggle(!hasValue);
+//     $(dom.clearLocationInput).toggle(hasValue);
+// }
 
 function showSearchedLocation() {
     var text = $(dom.locationInput).val();
@@ -59,7 +59,7 @@ function setPolygon(newPolygon) {
 
 function clearLocationInput() {
     $(dom.locationInput).val('');
-    showAppropriateButton();
+    // showAppropriateButton();
 }
 
 function clearLocationSearch() {

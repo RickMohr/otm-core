@@ -282,6 +282,14 @@ body {
             padding-left: 8px;
         }
 
+        &:valid {
+            .draw-area { display: none }
+            .clear-location-input { display: block }
+        }
+        &:invalid {
+            .draw-area { display: block }
+            .clear-location-input { display: none }
+        }
     }
     #boundary-typeahead {
         padding-right: 28px;
