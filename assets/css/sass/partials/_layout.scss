@@ -314,12 +314,16 @@ body {
 }
 
 .location-search-alternate {
-    padding: 4px 7px 6px 7px;
+    position: relative;
+    padding: 4px 23px 6px 7px;
     border: 1px solid $secondary-color;
     border-radius: 6px;
     background-color: $secondary-color;
     color: white;
     display: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     a {
         color: white;
@@ -328,12 +332,13 @@ body {
     .text {
         font-size: 1.2rem;
     }
-    .clear-custom-area, .clear-location-search, .cancel-draw {
-        float: right;
+    .cancel {
+        position: absolute;
+        right: 3px;
     }
     .controls {
         float: right;
-        margin-top: 4px;
+        margin: 4px -15px 0 0;
     }
 }
 
