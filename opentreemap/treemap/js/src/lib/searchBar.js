@@ -47,6 +47,7 @@ var dom = {
     speciesSearchToggle: '#species-toggle',
     speciesSearchContainer: '#species-search-wrapper',
     locationSearchTypeahead: '#boundary-typeahead',
+    clearLocationInput: '.clear-location-input',
     clearLocationSearch: '.clear-location-search',
     foreignKey: '[data-foreign-key]',
 };
@@ -109,6 +110,7 @@ function initTopTypeaheads() {
             geocoder: true,
             geocoderBbox: config.instance.extent
         }),
+        clearLocationInputStream = $(dom.clearLocationInput).asEventStream('click'),
         clearLocationSearchStream = $(dom.clearLocationSearch).asEventStream('click'),
         triggerSearchStream = Bacon.mergeAll(
             speciesTypeahead.selectStream,
@@ -116,9 +118,10 @@ function initTopTypeaheads() {
             clearLocationSearchStream
         );
 
-    clearLocationSearchStream.onValue(function () {
-        locationTypeahead.clear();
-    });
+    Bacon.mergeAll(clearLocationSearchStream, clearLocationInputStream)
+        .onValue(function () {
+            locationTypeahead.clear();
+        });
 
     return triggerSearchStream;
 }
@@ -215,13 +218,12 @@ function updateUi(search) {
 }
 
 function updateActiveSearchIndicators(search) {
-    var activeCategories = _(search.filter)
+    var simpleSearchKeys = ['species.id', 'mapFeature.geom'],
+        activeCategories = _(search.filter)
             .map(getFilterCategory)
             .unique()
             .filter() // remove "false" (category with a filter that isn't displayed)
-            .value(),
-
-        simpleSearchKeys = ['species.id', 'mapFeature.geom'];
+            .value();
 
     function getFilterCategory(filter, key) {
         var moreSearchFeatureBlacklist;

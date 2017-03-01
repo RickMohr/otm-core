@@ -40,7 +40,7 @@ function init(options) {
 function showAppropriateButton() {
     var hasValue = ($(dom.locationInput).val().length > 0);
     $(dom.drawArea).toggle(!hasValue);
-    $(dom.clearLocationSearch).toggle(hasValue);
+    $(dom.clearLocationInput).toggle(hasValue);
 }
 
 function showSearchedLocation() {
