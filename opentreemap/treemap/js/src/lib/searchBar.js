@@ -88,7 +88,7 @@ function redirectToSearchPage(filters, wmCoords) {
     window.location.href = reverse.map(config.instance.url_name) + '?' + query;
 }
 
-function initTopTypeaheads() {
+function initTopTypeaheads(directSearchStream) {
     var speciesTypeahead = otmTypeahead.create({
             name: "species",
             url: reverse.species_list_view(config.instance.url_name),
@@ -114,10 +114,15 @@ function initTopTypeaheads() {
         clearLocationInputStream = $(dom.clearLocationInput).asEventStream('click'),
         clearLocationSearchStream = $(dom.clearLocationSearch).asEventStream('click'),
         triggerSearchStream = Bacon.mergeAll(
+            directSearchStream,
             speciesTypeahead.selectStream,
             locationTypeahead.selectStream,
             clearLocationSearchStream
         );
+
+    directSearchStream.onValue(function () {
+        locationTypeahead.autocomplete();
+    });
 
     Bacon.mergeAll(
         clearLocationSearchStream,
@@ -381,11 +386,10 @@ module.exports = exports = {
     },
 
     init: function () {
-        var searchStream = Bacon.mergeAll(
-                initTopTypeaheads(),
-                BU.enterOrClickEventStream({
-                    inputs: 'input[data-class="search"]',
-                    button: '#perform-search,#location-perform-search'})),
+        var directSearchStream = BU.enterOrClickEventStream({
+                inputs: 'input[data-class="search"]',
+                button: '#perform-search,#location-perform-search'}),
+            searchStream = initTopTypeaheads(directSearchStream),
             resetStream = $(dom.resetButton).asEventStream("click"),
             searchFiltersProp = searchStream.map(Search.buildSearch).toProperty(),
             filtersStream = searchStream

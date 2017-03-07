@@ -174,7 +174,7 @@ var create = exports.create = function(options) {
             remote: {
                 url: url,
                 transform: function(response) {
-                    return response.suggestions;
+                    return _.filter(response.suggestions, {'isCollection': false});
                 },
                 prepare: function(query, settings) {
                     if (options.geocoderBbox) {
@@ -324,6 +324,10 @@ var create = exports.create = function(options) {
     }
 
     return {
+        autocomplete: function () {
+            var foo = $input.data('ttTypeahead').menu.getTopSelectable();
+            $input.typeahead('autocomplete', foo);
+        },
         getDatum: function() {
             return exports.getDatum($input);
         },
