@@ -21,11 +21,10 @@ module.exports.init = function (options) {
     // init mapManager before searchBar so that .setCenterWM is set
     var zoomLatLngOutputStream = mapManager.createTreeMap(options);
 
-    // When there is a single geocode result (either by an exact match
-    // or the user selects a candidate) move the map to it and zoom
-    // if the map is not already zoomed in.
     var searchBar = SearchBar.init();
 
+    // When there is a geocode result, move the map to it and zoom
+    // (if the map is not already zoomed in).
     searchBar.geocodedLocationStream.onValue(_.partial(onLocationFound, mapManager));
 
     var triggeredQueryStream =
@@ -67,12 +66,17 @@ module.exports.init = function (options) {
 
     var queryObject = url.parse(location.href, true).query;
     var embed = queryObject && queryObject.hasOwnProperty('embed');
+    var searchedLocationStream = Bacon.mergeAll(
+        searchBar.geocodedLocationStream.log('geocoded'),
+        searchBar.filterNonGeocodeObjectStream.log('boundary')
+    );
 
     return {
         mapManager: mapManager,
         map: mapManager.map,
         embed: !!embed,
         builtSearchEvents: builtSearchEvents,
+        searchedLocationStream: searchedLocationStream,
         getMapStateSearch: urlState.getSearch,
         mapStateChangeStream: urlState.stateChangeStream,
         zoomLatLngOutputStream: zoomLatLngOutputStream,

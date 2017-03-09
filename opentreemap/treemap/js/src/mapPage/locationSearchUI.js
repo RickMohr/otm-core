@@ -27,7 +27,7 @@ function init(options) {
     $(dom.clearLocationInput).click(clearLocationInput);
     $(dom.clearCustomArea).click(clearCustomArea);
 
-    options.builtSearchEvents.onValue(onSearchChanged);
+    options.searchedLocationStream.onValue(onSearchChanged);
 }
 
 function showAppropriateWellButton() {

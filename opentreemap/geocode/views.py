@@ -87,18 +87,19 @@ def geocode(request):
     key = request.REQUEST.get('key')
     address = request.REQUEST.get('address')
 
-    # See settings.OMGEO_SETTINGS for configuration
-    pq = PlaceQuery(query=address, key=key)
-    geocode_result = geocoder.geocode(pq)
-    candidates = geocode_result.get('candidates', None)
-    if candidates:
-        # There should only be one candidate since the user already chose a
-        # specific suggestion and the front end filters out suggestions that
-        # might result in more than one candidate (like "Beaches").
-        candidates = [_omgeo_candidate_to_dict(candidates[0])]
-        return {'candidates': candidates}
-    else:
-        return _no_results_response(address)
+    if key:
+        # See settings.OMGEO_SETTINGS for configuration
+        pq = PlaceQuery(query=address, key=key)
+        geocode_result = geocoder.geocode(pq)
+        candidates = geocode_result.get('candidates', None)
+        if candidates:
+            # There should only be one candidate since the user already chose a
+            # specific suggestion and the front end filters out suggestions that
+            # might result in more than one candidate (like "Beaches").
+            candidates = [_omgeo_candidate_to_dict(candidates[0])]
+            return {'candidates': candidates}
+
+    return _no_results_response(address)
 
 
 geocode_view = json_api_call(geocode)
