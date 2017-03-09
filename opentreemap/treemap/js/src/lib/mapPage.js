@@ -67,8 +67,8 @@ module.exports.init = function (options) {
     var queryObject = url.parse(location.href, true).query;
     var embed = queryObject && queryObject.hasOwnProperty('embed');
     var searchedLocationStream = Bacon.mergeAll(
-        searchBar.geocodedLocationStream.log('geocoded'),
-        searchBar.filterNonGeocodeObjectStream.log('boundary')
+        searchBar.geocodedLocationStream,
+        searchBar.filterNonGeocodeObjectStream
     );
 
     return {
