@@ -8,6 +8,7 @@ var dom = {
     locationSearched: '#location-searched .text',
     drawArea: '.draw-area',
     clearLocationInput: '.clear-location-input',
+    clearLocationSearch: '.clear-location-search',
     clearCustomArea: '.clear-custom-area',
     controls: {
         standard: '#location-search-well',
@@ -25,9 +26,10 @@ function init(options) {
     map = options.map;
     $(dom.locationInput).on('input', showAppropriateWellButton);
     $(dom.clearLocationInput).click(clearLocationInput);
+    $(dom.clearLocationSearch).click(onSearchChanged);
     $(dom.clearCustomArea).click(clearCustomArea);
 
-    options.searchedLocationStream.onValue(onSearchChanged);
+    options.searchedLocationChangedStream.onValue(onSearchChanged);
 }
 
 function showAppropriateWellButton() {

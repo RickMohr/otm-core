@@ -399,9 +399,13 @@ module.exports = exports = {
                 // typeahead box.
                 .filter(function() {
                     var datum = getSearchDatum();
-                    return datum && !datum.magicKey;
+                    return !(datum && datum.magicKey);
+                })
+                .map(Search.buildSearch)
+                .map(function (search) {
+                    var s = search;
+                    return s;
                 }),
-                // .map(Search.buildSearch),
             uSearch = udfcSearch.init(resetStream),
             searchChangedStream = Bacon
                 .mergeAll(searchStream, resetStream)

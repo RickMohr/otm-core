@@ -27,11 +27,12 @@ module.exports.init = function (options) {
     // (if the map is not already zoomed in).
     searchBar.geocodedLocationStream.onValue(_.partial(onLocationFound, mapManager));
 
-    var triggeredQueryStream =
-        Bacon.mergeAll(
+    var urlSearchChangedStream =
             urlState.stateChangeStream // URL changed
                 .filter('.search')     // search changed
                 .map('.search'),       // get search string
+        triggeredQueryStream = Bacon.mergeAll(
+            urlSearchChangedStream,
             searchBar.resetStream.map({})
         );
 
@@ -66,9 +67,14 @@ module.exports.init = function (options) {
 
     var queryObject = url.parse(location.href, true).query;
     var embed = queryObject && queryObject.hasOwnProperty('embed');
-    var searchedLocationStream = Bacon.mergeAll(
+
+    var searchedLocationChangedStream = Bacon.mergeAll(
+        urlSearchChangedStream,
         searchBar.geocodedLocationStream,
-        searchBar.filterNonGeocodeObjectStream
+        searchBar.filterNonGeocodeObjectStream.filter(function (search) {
+            return 'mapFeature.geom' in search.filter;
+        }),
+        searchBar.resetStream
     );
 
     return {
@@ -76,7 +82,7 @@ module.exports.init = function (options) {
         map: mapManager.map,
         embed: !!embed,
         builtSearchEvents: builtSearchEvents,
-        searchedLocationStream: searchedLocationStream,
+        searchedLocationChangedStream: searchedLocationChangedStream,
         getMapStateSearch: urlState.getSearch,
         mapStateChangeStream: urlState.stateChangeStream,
         zoomLatLngOutputStream: zoomLatLngOutputStream,
