@@ -86,7 +86,7 @@ var performAdd = function (e, activateTheMode) {
 buttonEnabler.run();
 
 modes.init(mapManager, triggerSearchFromSidebar, mapPage.embed,
-    completedSearchStream);
+    searchEvents, completedSearchStream);
 
 // Read state from current URL, initializing
 // zoom/lat/long/search/mode/selection

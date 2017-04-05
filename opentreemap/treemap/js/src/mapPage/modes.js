@@ -97,11 +97,12 @@ function activateMode(mode, sidebar, options) {
 }
 
 function inBrowseTreesMode() { return currentMode === browseTreesMode; }
+function inEditAreaMode()    { return currentMode === editAreaMode; }
 function inAddTreeMode()     { return currentMode === addTreeMode; }
 function inEditTreeMode()    { return currentMode === editTreeDetailsMode; }
 function inAddResourceMode() { return currentMode === addResourceMode; }
 
-function init(mapManager, triggerSearchBus, embed, completedSearchStream) {
+function init(mapManager, triggerSearchBus, embed, searchEvents, completedSearchStream) {
     map = mapManager.map;
 
     // browseTreesMode and editTreeDetailsMode share an inlineEditForm,
@@ -160,7 +161,9 @@ function init(mapManager, triggerSearchBus, embed, completedSearchStream) {
     editAreaMode.init({
         map: map,
         modes: this,
-        tooltipStrings: config.trans.tooltipForEditArea
+        tooltipStrings: config.trans.tooltipForEditArea,
+        inMyMode: inEditAreaMode,
+        searchEvents: searchEvents
     });
 
     addTreeMode.init({

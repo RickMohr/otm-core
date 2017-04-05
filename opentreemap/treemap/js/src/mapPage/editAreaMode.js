@@ -30,6 +30,12 @@ function init(options) {
     $(dom.editArea).click(modes.activateEditAreaMode);
     $(dom.saveArea).click(saveArea);
     $(dom.cancelEdit).click(cancelEditing);
+
+    options.searchEvents.onValue(function () {
+        if (options.inMyMode()) {
+            cancelEditing();
+        }
+    });
 }
 
 function activate() {
