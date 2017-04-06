@@ -28,7 +28,10 @@ var mapPage = MapPage.init({
         Bacon.mergeAll(
             mapPage.builtSearchEvents,
             triggerSearchFromSidebar.map(mapPage.getMapStateSearch)
-        ),
+        )
+            .doAction(function () {
+                modes.onSearchBefore();
+            }),
 
     modeChangeStream = mapPage.mapStateChangeStream
         .filter(BU.isPropertyDefined('modeName')),

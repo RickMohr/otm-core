@@ -100,6 +100,7 @@ function inBrowseTreesMode() { return currentMode === browseTreesMode; }
 function inAddTreeMode()     { return currentMode === addTreeMode; }
 function inEditTreeMode()    { return currentMode === editTreeDetailsMode; }
 function inAddResourceMode() { return currentMode === addResourceMode; }
+function inEditAreaMode()     { return currentMode === editAreaMode; }
 
 function init(mapManager, triggerSearchBus, embed, completedSearchStream) {
     map = mapManager.map;
@@ -213,11 +214,18 @@ function getSpeciesTypeaheadOptions(idPrefix) {
     };
 }
 
+function onSearchBefore() {
+    if (inEditAreaMode()) {
+        editAreaMode.saveArea();
+    }
+}
+
 module.exports = {
     init: init,
     activateBrowseTreesMode: activateBrowseTreesMode,
     activateDrawAreaMode: activateDrawAreaMode,
     activateEditAreaMode: activateEditAreaMode,
     activateAddTreeMode: activateAddTreeMode,
-    activateAddResourceMode: activateAddResourceMode
+    activateAddResourceMode: activateAddResourceMode,
+    onSearchBefore: onSearchBefore
 };

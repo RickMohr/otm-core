@@ -96,5 +96,6 @@ module.exports = {
     name: 'editArea',
     init: init,
     activate: activate,
-    deactivate: deactivate
+    deactivate: deactivate,
+    saveArea: saveArea
 };
