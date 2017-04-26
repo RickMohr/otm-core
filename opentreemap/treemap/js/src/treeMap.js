@@ -117,3 +117,11 @@ $('#feature-panel').on('click', '.sidebar-panel-toggle', function() {
 $('#eco-panel').on('click', '.sidebar-panel-toggle', function() {
     $('#eco-panel').toggleClass('expanded full');
 });
+
+var $modelingButton = $('#open-modeling-page');
+$modelingButton.on('click', function (e) {
+    if ($modelingButton.data('itree-region-count') === 0) {
+        $('#noRegion').modal('show');
+        e.preventDefault();
+    }
+});

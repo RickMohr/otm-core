@@ -83,6 +83,7 @@ def global_settings(request):
         'term': term,
         'embed': request_is_embedded(request),
         'datepicker_start_date': datetime.min.replace(year=1900),
+        'support_email': settings.SUPPORT_EMAIL_ADDRESS
     }
 
     return ctx
